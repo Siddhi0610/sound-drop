@@ -1,7 +1,11 @@
 WHAT IS SOUND-DROP ?
+
+
 A software that converts your data into high frequency audio signals and transmit it to a reciever where the audio is recieved & reconverted back to your data. inspired from sound converting into electrical pulses and vice versa.
 
 WORKING UNDERSTANDING 
+
+
 
 STORYTIME [IGNORE]
 
