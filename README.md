@@ -5,7 +5,8 @@ A software that converts your data into high frequency audio signals and transmi
 
 WORKING UNDERSTANDING 
 
-
+transmitter has fsk modulation converting data into binary 0&1 and this will binary code will get converted into high frequency sound waves 0 - 18khz & 1 - 19khz. 
+this high frequency tone is captured by a reciever , performing fft demodulation converting sound signals to back to binary code back to data.
 
 STORYTIME [IGNORE]
 
