@@ -8,6 +8,9 @@ WORKING UNDERSTANDING
 transmitter has fsk modulation converting data into binary 0&1 and this will binary code will get converted into high frequency sound waves 0 - 18khz & 1 - 19khz. 
 this high frequency tone is captured by a reciever , performing fft demodulation converting sound signals to back to binary code back to data.
 
+<br>
+what to push on github when i have nothing to push ?
+
 STORYTIME [IGNORE]
 
 1. I wanted to explore different ways of data transfer. So I deep dived into transfer of data via light in optical fibres , via radio waves in bluetooth & wifi , i thought of sound and realised it is a mechanical wave getting converted into electric pulses and vice versa. 
