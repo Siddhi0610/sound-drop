@@ -1,122 +1,132 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import Header from "./components/Header";
+import TransmissionPanel from "./components/TransmissionPanel";
+import ReceiverPanel from "./components/ReceiverPanel";
+import SignalMonitor from "./components/SignalMonitor";
+import BinaryStream from "./components/BinaryStream";
+import HowItWorks from "./components/HowItWorks";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [payload, setPayload] = useState("HELLO SOUND DROP");
+  const [isTransmitting, setIsTransmitting] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [decodedData, setDecodedData] = useState("WAITING FOR SIGNAL...");
+
+  const transmit = () => {
+    if (!payload.trim()) return;
+
+    setIsTransmitting(true);
+    setDecodedData("TRANSMITTING...");
+
+    setTimeout(() => {
+      setIsTransmitting(false);
+      setDecodedData(payload);
+    }, 1800);
+  };
+
+  const listen = () => {
+    setIsListening(true);
+    setDecodedData("SCANNING FREQUENCIES...");
+
+    setTimeout(() => {
+      setIsListening(false);
+      setDecodedData(payload || "NO SIGNAL DETECTED");
+    }, 2200);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+    <div className="app">
+      <Header />
+
+      <main className="main-container">
+
+        <section className="hero">
+          <div className="issue-label">
+            VOL. 01 · ISSUE 01 · AUDIO COMMUNICATION
+          </div>
+
+          <h1>DATA, DELIVERED<br />THROUGH SOUND.</h1>
+
+          <p className="hero-description">
+            SoundDrop converts digital information into high-frequency
+            audio signals, transmits them through the air, and reconstructs
+            the original data at the receiving end.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+          <div className="hero-rule">
+            <span>FSK MODULATION</span>
+            <span>18–19 KHZ</span>
+            <span>FFT DEMODULATION</span>
+          </div>
+        </section>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <section className="workspace">
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <TransmissionPanel
+            payload={payload}
+            setPayload={setPayload}
+            transmit={transmit}
+            isTransmitting={isTransmitting}
+          />
+
+          <ReceiverPanel
+            listen={listen}
+            isListening={isListening}
+            decodedData={decodedData}
+          />
+
+        </section>
+
+        <SignalMonitor
+          isActive={isTransmitting || isListening}
+        />
+
+        <section className="technical-grid">
+
+          <BinaryStream payload={payload} />
+
+          <div className="technical-card">
+            <span className="technical-label">MODULATION</span>
+
+            <div className="frequency-row">
+              <span>BIT 0</span>
+              <strong>18.0 kHz</strong>
+            </div>
+
+            <div className="frequency-row">
+              <span>BIT 1</span>
+              <strong>19.0 kHz</strong>
+            </div>
+          </div>
+
+          <div className="technical-card">
+            <span className="technical-label">DEMODULATION</span>
+
+            <div className="process-text">
+              AUDIO SIGNAL
+              <span>↓</span>
+              FFT ANALYSIS
+              <span>↓</span>
+              FREQUENCY
+              <span>↓</span>
+              BINARY DATA
+            </div>
+          </div>
+
+        </section>
+
+        <HowItWorks />
+
+      </main>
+
+      <footer>
+        <span>SOUNDDROP SYSTEMS</span>
+        <span>DATA OVER SOUND</span>
+        <span>EST. 2026</span>
+      </footer>
+    </div>
+  );
 }
 
-export default App
+export default App;
