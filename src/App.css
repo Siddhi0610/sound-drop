@@ -766,3 +766,47 @@ footer {
   }
 
 }
+.receiver-frequency {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 12px;
+
+  padding: 12px;
+
+  border-bottom: 1px dotted var(--soft-line);
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 9px;
+}
+
+.receiver-frequency span {
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.receiver-frequency strong {
+  color: var(--accent);
+
+  font-size: 12px;
+}
+
+.binary-output {
+  max-height: 110px;
+
+  overflow: auto;
+
+  word-break: break-all;
+
+  line-height: 1.7;
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 11px;
+}
+
+.stop-button {
+  background: var(--accent);
+}
