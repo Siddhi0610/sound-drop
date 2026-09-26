@@ -71,9 +71,7 @@ function App() {
           />
 
           <ReceiverPanel
-            listen={listen}
-            isListening={isListening}
-            decodedData={decodedData}
+            
           />
 
         </section>
