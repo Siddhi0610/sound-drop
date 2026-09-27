@@ -1,11 +1,14 @@
 const ZERO_FREQUENCY = 18000;
 const ONE_FREQUENCY = 19000;
 
-const SYMBOL_DURATION = 0.08; // 80 ms per bit
+const SYMBOL_DURATION = 0.08;
+
+const PREAMBLE = "10101010";
 
 export class FSKTransmitter {
-  constructor({ onStatus }) {
+  constructor({ onStatus, onBit }) {
     this.onStatus = onStatus;
+    this.onBit = onBit;
 
     this.audioContext = null;
     this.oscillator = null;
@@ -14,9 +17,11 @@ export class FSKTransmitter {
     this.isTransmitting = false;
   }
 
-  textToBits(text) {
-    const bytes = new TextEncoder().encode(text);
+  textToBytes(text) {
+    return new TextEncoder().encode(text);
+  }
 
+  bytesToBits(bytes) {
     let bits = "";
 
     for (const byte of bytes) {
@@ -28,7 +33,26 @@ export class FSKTransmitter {
     return bits;
   }
 
+  createPacket(text) {
+    const payloadBytes = this.textToBytes(text);
+
+    const payloadBits =
+      this.bytesToBits(payloadBytes);
+
+    const lengthBits =
+      payloadBytes.length
+        .toString(2)
+        .padStart(16, "0");
+
+    return (
+      PREAMBLE +
+      lengthBits +
+      payloadBits
+    );
+  }
+
   async transmit(text) {
+
     if (!text || this.isTransmitting) {
       return;
     }
@@ -36,12 +60,18 @@ export class FSKTransmitter {
     this.isTransmitting = true;
 
     try {
-      this.onStatus?.("PREPARING DATA");
 
-      const bits = this.textToBits(text);
+      const bits =
+        this.createPacket(text);
 
-      console.log("Payload:", text);
-      console.log("Binary:", bits);
+      console.log(
+        "Transmission packet:",
+        bits
+      );
+
+      this.onStatus?.(
+        `PACKET READY · ${bits.length} BITS`
+      );
 
       this.audioContext =
         new AudioContext();
@@ -64,29 +94,26 @@ export class FSKTransmitter {
         this.audioContext.destination
       );
 
-      // Keep the signal reasonably quiet.
       this.gainNode.gain.setValueAtTime(
         0,
         this.audioContext.currentTime
       );
 
       const startTime =
-        this.audioContext.currentTime + 0.1;
+        this.audioContext.currentTime + 0.2;
 
       this.oscillator.start(startTime);
-
-      // Small fade-in.
-      this.gainNode.gain.setValueAtTime(
-        0,
-        startTime
-      );
 
       this.gainNode.gain.linearRampToValueAtTime(
         0.35,
         startTime + 0.02
       );
 
-      for (let i = 0; i < bits.length; i++) {
+      for (
+        let i = 0;
+        i < bits.length;
+        i++
+      ) {
 
         const bit = bits[i];
 
@@ -105,19 +132,18 @@ export class FSKTransmitter {
             symbolStart
           );
 
-        this.onStatus?.(
-          `TRANSMITTING BIT ${i + 1}/${bits.length}`
-        );
+        this.onBit?.(bit, i);
+
       }
 
       const endTime =
         startTime +
-        bits.length * SYMBOL_DURATION;
+        bits.length *
+        SYMBOL_DURATION;
 
-      // Fade out.
       this.gainNode.gain.setValueAtTime(
         0.35,
-        endTime - 0.02
+        endTime - 0.03
       );
 
       this.gainNode.gain.linearRampToValueAtTime(
@@ -125,22 +151,29 @@ export class FSKTransmitter {
         endTime
       );
 
-      this.oscillator.stop(endTime + 0.02);
+      this.oscillator.stop(
+        endTime + 0.05
+      );
 
-      this.onStatus?.("TRANSMITTING");
+      this.onStatus?.(
+        "TRANSMITTING"
+      );
 
       setTimeout(() => {
+
         this.cleanup();
 
-        this.onStatus?.("TRANSMISSION COMPLETE");
-      }, (bits.length * SYMBOL_DURATION + 0.3) * 1000);
+        this.onStatus?.(
+          "TRANSMISSION COMPLETE"
+        );
+
+      }, (bits.length *
+        SYMBOL_DURATION +
+        0.4) * 1000);
 
     } catch (error) {
 
-      console.error(
-        "Transmission error:",
-        error
-      );
+      console.error(error);
 
       this.cleanup();
 
@@ -165,7 +198,9 @@ export class FSKTransmitter {
     }
 
     if (this.audioContext) {
-      this.audioContext.close();
+      try {
+        this.audioContext.close();
+      } catch {}
     }
 
     this.oscillator = null;
@@ -178,6 +213,8 @@ export class FSKTransmitter {
   stop() {
     this.cleanup();
 
-    this.onStatus?.("STANDBY");
+    this.onStatus?.(
+      "STANDBY"
+    );
   }
 }
