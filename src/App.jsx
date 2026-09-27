@@ -65,9 +65,7 @@ function App() {
 
           <TransmissionPanel
             payload={payload}
-            setPayload={setPayload}
-            transmit={transmit}
-            isTransmitting={isTransmitting}
+           
           />
 
           <ReceiverPanel
