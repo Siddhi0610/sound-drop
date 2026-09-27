@@ -14,6 +14,9 @@ function ReceiverPanel() {
   const [bits, setBits] =
     useState("");
 
+  const [decoded, setDecoded] =
+    useState("");
+
   useEffect(() => {
 
     return () => {
@@ -25,34 +28,36 @@ function ReceiverPanel() {
   const startListening = async () => {
 
     setBits("");
+    setDecoded("");
     setFrequency(null);
 
     const receiver =
       new FSKReceiver({
 
-        onBit: (bit) => {
+        onBit: (bit, stream) => {
 
-          setBits(previous =>
-            previous + bit
-          );
-
+          setBits(stream);
         },
 
         onFrequency: (freq) => {
 
           setFrequency(freq);
-
         },
 
         onStatus: (newStatus) => {
 
           setStatus(newStatus);
+        },
 
+        onDecoded: (message) => {
+
+          setDecoded(message);
         },
 
       });
 
-    receiverRef.current = receiver;
+    receiverRef.current =
+      receiver;
 
     await receiver.start();
   };
@@ -64,6 +69,8 @@ function ReceiverPanel() {
     receiverRef.current = null;
 
     setFrequency(null);
+
+    setStatus("STANDBY");
   };
 
   return (
@@ -72,6 +79,7 @@ function ReceiverPanel() {
       <div className="panel-heading">
 
         <div>
+
           <span className="section-number">
             02
           </span>
@@ -79,6 +87,7 @@ function ReceiverPanel() {
           <span className="section-label">
             RECEIVER
           </span>
+
         </div>
 
         <span className="panel-code">
@@ -92,19 +101,16 @@ function ReceiverPanel() {
       </h2>
 
       <p className="panel-description">
-        SoundDrop listens through your microphone,
-        performs frequency analysis, and reconstructs
-        the transmitted binary stream.
+        SoundDrop listens for the FSK carrier,
+        identifies each symbol, reconstructs
+        the binary packet and decodes the payload.
       </p>
 
       <div className="receiver-status">
 
         <div>
-
           <span className="status-dot"></span>
-
           MICROPHONE INPUT
-
         </div>
 
         <strong>
@@ -121,28 +127,34 @@ function ReceiverPanel() {
 
         <strong>
           {frequency
-            ? `${(frequency / 1000).toFixed(1)} kHz`
+            ? `${(
+                frequency / 1000
+              ).toFixed(1)} kHz`
             : "--"}
         </strong>
 
       </div>
 
-      {status === "LISTENING" ? (
+      {status === "STANDBY" ? (
 
         <button
-          className="newspaper-button stop-button"
-          onClick={stopListening}
+          className="newspaper-button"
+          onClick={
+            startListening
+          }
         >
-          STOP LISTENING ■
+          START LISTENING →
         </button>
 
       ) : (
 
         <button
-          className="newspaper-button"
-          onClick={startListening}
+          className="newspaper-button stop-button"
+          onClick={
+            stopListening
+          }
         >
-          START LISTENING →
+          STOP LISTENING ■
         </button>
 
       )}
@@ -154,8 +166,22 @@ function ReceiverPanel() {
         </span>
 
         <div className="binary-output">
+          {bits ||
+            "WAITING FOR SIGNAL..."}
+        </div>
 
-          {bits || "WAITING FOR SIGNAL..."}
+      </div>
+
+      <div className="decoded-box">
+
+        <span>
+          DECODED PAYLOAD
+        </span>
+
+        <div className="decoded-message">
+
+          {decoded ||
+            "NO MESSAGE DECODED"}
 
         </div>
 
