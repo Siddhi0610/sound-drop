@@ -24,3 +24,6 @@ did not do anything today. was busy with dbms file completeion
 
 29-09-26
 did not do anything. was busy facing a nice emotional hit 
+
+29-09-26
+missed gdgc
