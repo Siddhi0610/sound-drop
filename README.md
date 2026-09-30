@@ -27,3 +27,6 @@ did not do anything. was busy facing a nice emotional hit
 
 29-09-26
 missed gdgc
+
+30-09-26
+fixed r. moms health is worsening. no code today
